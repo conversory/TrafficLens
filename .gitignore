@@ -1,0 +1,12 @@
+bin/
+obj/
+dist/
+test-results/
+TrafficLens-Data/
+*.user
+*.log
+*.db
+*.db-*
+*.bak
+*.tmp
+.vs/

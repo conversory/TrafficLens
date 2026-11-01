@@ -1,0 +1,20 @@
+name: Windows build and accounting tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore --locked-mode
+      - run: dotnet publish -c Release --no-restore -o dist
+      - shell: pwsh
+        run: |
+          $p = Start-Process ./dist/TrafficLens.exe -ArgumentList '--history-test test-results/history.json' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw 'History tests failed' }
+          $result = Get-Content test-results/history.json -Raw | ConvertFrom-Json
+          if (!$result.Passed) { throw 'Accounting regression' }
