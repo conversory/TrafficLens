@@ -80,8 +80,10 @@ MIT 许可证见 LICENSE；设计参考和第三方依赖见 THIRD_PARTY_NOTICES
 
 安装 Windows .NET 10 SDK 后执行：
 ```powershell
-dotnet restore --locked-mode
+pwsh -File ./tools/Restore-Dependencies.ps1
 dotnet publish -c Release --no-restore -o dist
 .\dist\TrafficLens.exe --history-test .\test-results\history.json
 ```
 历史测试要求新的空测试目录。测试会自动隔离数据；真实采样测试用 `--history-live-test`，需要本机 Clash。
+
+还原脚本需要 PowerShell 7。应用依赖及其传递依赖的版本和内容哈希必须与锁文件一致；只有 SDK 自动选择的 `Microsoft.NET.ILLink.Tasks` 允许随 .NET 10 SDK 更新。脚本验证后恢复仓库锁文件，后续发布使用 `--no-restore` 复用本次还原结果。若确实升级应用依赖，应先审查并更新锁文件。CI 在 Windows Server 2022 与最新 Windows runner 上分别验证。

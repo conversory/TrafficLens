@@ -4,13 +4,19 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
-      - run: dotnet restore --locked-mode
+      - name: Restore and verify application dependencies
+        shell: pwsh
+        run: ./tools/Restore-Dependencies.ps1
       - run: dotnet publish -c Release --no-restore -o dist
       - shell: pwsh
         run: |
